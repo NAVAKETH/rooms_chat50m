@@ -8,5 +8,5 @@ COPY --from=build /bin/listChat /
 COPY ./config.yaml /config.yaml
 # COPY image_pdf_file /app/image_pdf_file
 ENV TZ=Asia/Bangkok
-EXPOSE 3000
+EXPOSE 4000
 CMD ["/listChat"]
