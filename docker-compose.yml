@@ -5,6 +5,8 @@ services:
     image: "repo.korkla.in/mon-listchat"
     ports:
       - "3100:4000"
-    environment:
-      - ENV=uat
+    # environment:
+    #   - ENV=uat
+    env_file:
+      - .env
     restart: always
