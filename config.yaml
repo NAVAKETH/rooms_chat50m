@@ -6,3 +6,7 @@ db:
   username: "databaseTestGo"
   password: "S@kpp4592!"
   port: "5432"
+
+# APP_PORT=800
+
+# DB_HOST=localhost

@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  listchat:
+    image: "listchat"
+    ports:
+      - "3100:3000"
+    environment:
+      - ENV=uat
+    restart: always

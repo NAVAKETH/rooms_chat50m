@@ -4,6 +4,8 @@ import (
 	"log"
 	"messageApp/database"
 	"messageApp/routes"
+	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -11,16 +13,36 @@ import (
 )
 
 func initConfig() {
-	viper.SetConfigName("config") //ตั้งค่าชื่อไฟล์ที่จะดึง
-	viper.SetConfigType("yaml")   //ตั้งค่านามสกุลของไฟล์ที่จะดึงค่าของ env มาใช้
-	viper.AddConfigPath(".")      //กำหนด path ที่จะดึงไฟล์
-	viper.AutomaticEnv()          //กำหนดให้หากมีค่าของ env ตั้งค่าอยู่แล้วจะดึงค่าของ env มาเป็นลำดับแรก
+	switch os.Getenv("ENV") {
+	case "":
+		os.Setenv("ENV", "dev")
+		viper.SetConfigName("config_dev")
+	default:
+		viper.SetConfigName("config")
+	}
+
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(err)
 	}
 }
+
+// func initConfig() {
+// 	viper.SetConfigName("config") //ตั้งค่าชื่อไฟล์ที่จะดึง
+// 	viper.SetConfigType("yaml")   //ตั้งค่านามสกุลของไฟล์ที่จะดึงค่าของ env มาใช้
+// 	viper.AddConfigPath(".")      //กำหนด path ที่จะดึงไฟล์
+// 	viper.AutomaticEnv()          //กำหนดให้หากมีค่าของ env ตั้งค่าอยู่แล้วจะดึงค่าของ env มาเป็นลำดับแรก
+
+// 	err := viper.ReadInConfig()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
 
 func setUpRoutes(app *fiber.App) {
 	app.Get("/hello", routes.Hello)
