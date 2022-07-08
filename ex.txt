@@ -1,0 +1,69 @@
+CREATE VIEW list_chats AS
+WITH all_last_message AS (
+ SELECT
+  *
+ FROM (
+  SELECT
+   messages.*,
+   row_number() OVER (PARTITION BY messages.token_room ORDER BY messages.timestamp DESC) AS row_number
+  FROM
+   messages) AS list_messages
+WHERE
+ row_number = 1
+)
+SELECT
+ rooms.token_room, 
+    rooms.room_type, 
+    rooms.room_name, 
+    rooms.created_at,
+    rooms.is_pin, 
+    users.token_user, 
+    all_last_message.message AS last_message, 
+    all_last_message.timestamp AS last_message_time, 
+    all_last_message.sender AS last_message_send_by, 
+    all_last_message.message_type AS last_message_message_type, 
+    COALESCE(list_user_not_read.count, 0::bigint) AS count_not_read, 
+    list_friend.token_user AS friend_user_id, 
+    list_friend.one_id AS friend_one_id,
+    boardcasts_data.tokenuser AS boardcast_by,
+    boardcasts_data.message_type AS boardcast_message_type,
+    boardcasts_data.message AS boardcast_message,
+    boardcasts_data.timestamp AS boardcast_time
+FROM
+ rooms
+ LEFT JOIN users ON rooms.token_user = users.token_user
+ LEFT JOIN all_last_message ON rooms.token_room = all_last_message.token_room
+ LEFT JOIN (
+  SELECT
+   count(messages.token_message) AS count,
+   users_1.token_user,
+   room_1.token_room
+  FROM
+   messages
+   LEFT JOIN rooms room_1 ON room_1.token_room = messages.token_room
+   LEFT JOIN users users_1 ON users_1.token_user = room_1.token_user
+  WHERE
+   messages.timestamp > room_1.last_seen
+   AND messages.sender <> users_1.token_user
+   AND messages.message_type <> 'unsend_message'::text
+  GROUP BY
+   users_1.token_user,
+   room_1.token_room) AS list_user_not_read ON list_user_not_read.token_user = rooms.token_user
+ AND list_user_not_read.token_room = rooms.token_room
+ LEFT JOIN (
+  SELECT
+   users_1.*,
+   room_1.token_room
+  FROM
+   users users_1
+   LEFT JOIN rooms room_1 ON room_1.token_user = users_1.token_user
+  WHERE
+   room_1.room_type = 'user'::text) AS list_friend ON list_friend.token_user <> users.token_user
+ AND list_friend.token_room = rooms.token_room
+ LEFT JOIN (
+  SELECT
+   boardcasts_1.*
+  FROM boardcasts boardcasts_1
+  LEFT JOIN rooms room_1 ON boardcasts_1.token_room = room_1.token_room
+  WHERE boardcasts_1.timestamp > room_1.last_seen AND boardcasts_1.message_type <> 'unsend_message'::text
+ ) AS boardcasts_data  ON boardcasts_data.token_room = rooms.token_room;

@@ -1,0 +1,8 @@
+app:
+  port: 8000
+db:
+  host: "localhost"
+  name: "databaseTestGo"
+  username: "databaseTestGo"
+  password: "S@kpp4592!"
+  port: "5432"
