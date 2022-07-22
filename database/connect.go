@@ -38,12 +38,12 @@ func ConnectDB() {
 	db, err := gorm.Open(postgres.Open(dns), &gorm.Config{
 		Logger: &SqlLogger{},
 		// DryRun: true,		ตัว Dryrun หากเปิดทำงานจะเป็นการรันออกมาแบบหลอกๆไม่ได้ทำงานจริง เอาไวศึกษาการทำงานของ GORM Query
-		CreateBatchSize: 1000,
+		// CreateBatchSize: 1000,
 	})
 	if err != nil {
 		panic(err)
 	}
-	db = db.Session(&gorm.Session{CreateBatchSize: 1000})
+	// db = db.Session(&gorm.Session{CreateBatchSize: 1000})
 	fmt.Println("Connect to Database Success!")
 	db.AutoMigrate(&model.User{}, &model.Room{}, &model.Message{}, model.Member{})
 

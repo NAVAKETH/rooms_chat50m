@@ -1,0 +1,634 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API ListChat demo 50m recoard database",
+        "title": "ListChat50M",
+        "contact": {
+            "name": "Navaketh Ploypho",
+            "url": "https://www.pasail.com",
+            "email": "navaketh.pl@inet.co.th"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:4000",
+    "basePath": "/api",
+    "paths": {
+        "/v1/all_user": {
+            "get": {
+                "description": "เพื่อให้เห็นว่ามีผู้ใช้ทั้งหมดเท่าไรในระบบตอนนี้\nจำเป็นต้องระบุข้อมูลสำคัญดังนี้ `\"limit\" สำหรับระบุจำนวนสูงสุด` และ `\"offset\" สำหรับระบุการ skip ข้อมูล`",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "สำหรับดึงข้อมูลผู้ใช้ทุกคนออกมา",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.ResponseSuccess"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.ReturnAllUser"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseError422"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/chat/{room-id}": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "สำหรับส่งข้อความระหว่าง user ในห้องแชต",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "chat room id",
+                        "name": "room-id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "ทดสอบ",
+                        "name": "Payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.requestCreateRoomPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseNoDataSuccess"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseError422"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/create_room": {
+            "post": {
+                "description": "API สำหรับสร้างห้องแชต แบบแชตกลุ่ม และ แชตเดี่ยว\nกรณีสำหรับระบุแชตเดี่ยวให้กำหนด room_type เป็น `Personal` กรณีแชตกลุ่มให้กำหนด room_type เป็น `Group`",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Room"
+                ],
+                "summary": "สำหรับสร้างห้องแชตระหว่าง user",
+                "parameters": [
+                    {
+                        "description": "ทดสอบ",
+                        "name": "Payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.requestCreateRoomPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseNoDataSuccess"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseError422"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/friend": {
+            "get": {
+                "description": "เพื่อให้เห็นว่าผู้ใช้มีเพื่อนทั้งหมดเท่าไรในระบบตอนนี้\nจำเป็นต้องระบุข้อมูลสำคัญดังนี้ limit สำหรับระบุจำนวนสูงสุด offset สำหรับข้อมูลที่จะปล่อยผ่าน",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "สำหรับลิสผู้ใช้ที่เป็นเพื่อนของเป้าหมายที่กำหนด",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/hello": {
+            "get": {
+                "description": "if you call this api with GET and it return \"Hello Fiber!\" that api work!",
+                "tags": [
+                    "Help check"
+                ],
+                "summary": "For test api",
+                "responses": {}
+            }
+        },
+        "/v1/listchat": {
+            "get": {
+                "description": "ดึงรายการคู่แชตของผู้ใช้ออกมาโดยเรียงตามลำดับเวลา\nจำเป็นต้องระบุข้อมูลสำคัญดังนี้ `\"user_id\" สำหรับระบุเป้าหมายของ listchat ที่ต้องการ` และ `\"limit\" สำหรับระบุจำนวนสูงสุด` และ `\"offset\" สำหรับระบุการ skip ข้อมูล`",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "สำหรับดึงคู่แชตของผู้ใช้",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.ResponseSuccess"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.ReturnListChat"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseError422"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/no_friend": {
+            "get": {
+                "description": "เพื่อให้เห็นว่ามีผู้ใช้ที่ยังไม่เป็นเพื่อนเท่าไรในระบบตอนนี้\nจำเป็นต้องระบุข้อมูลสำคัญดังนี้ limit สำหรับระบุจำนวนสูงสุด offset สำหรับข้อมูลที่จะปล่อยผ่าน",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "สำหรับลิสผู้ใช้ที่ยังไม่ได้เป็นเพื่อนกับเป้าหมายที่กำหนด",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/register": {
+            "post": {
+                "description": "เป็นขั้นตอนแรกสำหรับสร้างข้อมูลจำลองเข้าสู่ระบบโดยจำเป็นต้องโฟกัสข้อมูลที่ต้องสร้างหลักๆอยู่ 2 คีย์คือ `user_name` และ `emain` ที่จะต้องห้ามซ้ำกันกับข้อมูลที่เคยมีอยู่ในระบบเด็ดขาด",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Register"
+                ],
+                "summary": "สำหรับเพิ่มข้อมูลงของสมาชิกเข้าสู่ระบบ",
+                "parameters": [
+                    {
+                        "description": "กรณี แนบ payload มาด้วย",
+                        "name": "Payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.requestRegisterPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseCreateSuccess"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseError409"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseError422"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.requestCreateRoomPayload": {
+            "type": "object",
+            "properties": {
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "room_type": {
+                    "type": "string",
+                    "example": "'Personal' or 'Group'"
+                }
+            }
+        },
+        "api.requestRegisterPayload": {
+            "type": "object",
+            "properties": {
+                "emain": {
+                    "type": "string",
+                    "example": "example@mail.com"
+                },
+                "first_name": {
+                    "type": "string",
+                    "example": "Jonh"
+                },
+                "img": {
+                    "type": "string",
+                    "example": "./abc/123demo_path.png"
+                },
+                "last_name": {
+                    "type": "string",
+                    "example": "Smith"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "demoPassW0rd@123!"
+                },
+                "user_name": {
+                    "type": "string",
+                    "example": "J0nh"
+                }
+            }
+        },
+        "model.DataUser": {
+            "type": "object",
+            "properties": {
+                "gen_id": {
+                    "type": "string",
+                    "example": "ec2a2526-53f2-4fbf-8b61-1234567xxxxx"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "img": {
+                    "type": "string",
+                    "example": "./abc/123.jpg"
+                },
+                "last_message": {
+                    "type": "string",
+                    "example": "hello i am J0nh"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Mr.J0nh"
+                },
+                "room_type": {
+                    "type": "string",
+                    "example": "Personal"
+                },
+                "unread": {
+                    "type": "integer",
+                    "example": 999
+                },
+                "update_time": {
+                    "type": "string",
+                    "example": ""
+                }
+            }
+        },
+        "model.Member": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "friend_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "room_id": {
+                    "type": "integer"
+                },
+                "themes": {
+                    "type": "string"
+                },
+                "unread": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/model.User"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Message": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "room": {
+                    "$ref": "#/definitions/model.Room"
+                },
+                "room_id": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/model.User"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.ResponseCreateSuccess": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Success"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 201
+                }
+            }
+        },
+        "model.ResponseError409": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "user_name or email is already"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 409
+                }
+            }
+        },
+        "model.ResponseError422": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "some error message"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 422
+                }
+            }
+        },
+        "model.ResponseNoDataSuccess": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "success"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "model.ResponseSuccess": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string",
+                    "example": "success"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "model.ReturnAllUser": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "start": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 999
+                },
+                "user": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "username": {
+                                "type": "string",
+                                "example": "J0nh"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "model.ReturnListChat": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.DataUser"
+                    }
+                },
+                "end": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "start": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 999
+                }
+            }
+        },
+        "model.Room": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "gen_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_message": {
+                    "type": "string"
+                },
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Member"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "room_img": {
+                    "type": "string"
+                },
+                "room_type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "emain": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "img": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

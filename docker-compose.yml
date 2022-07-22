@@ -2,6 +2,7 @@ version: "3.7"
 
 services:
   listchat:
+    # image: "listchat"
     image: "repo.korkla.in/mon-listchat"
     ports:
       - "3100:4000"

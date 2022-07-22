@@ -1,0 +1,432 @@
+basePath: /api
+definitions:
+  api.requestCreateRoomPayload:
+    properties:
+      members:
+        items:
+          properties:
+            user_id:
+              type: integer
+          type: object
+        type: array
+      name:
+        type: string
+      room_type:
+        example: '''Personal'' or ''Group'''
+        type: string
+    type: object
+  api.requestRegisterPayload:
+    properties:
+      emain:
+        example: example@mail.com
+        type: string
+      first_name:
+        example: Jonh
+        type: string
+      img:
+        example: ./abc/123demo_path.png
+        type: string
+      last_name:
+        example: Smith
+        type: string
+      password:
+        example: demoPassW0rd@123!
+        type: string
+      user_name:
+        example: J0nh
+        type: string
+    type: object
+  model.DataUser:
+    properties:
+      gen_id:
+        example: ec2a2526-53f2-4fbf-8b61-1234567xxxxx
+        type: string
+      id:
+        example: 1
+        type: integer
+      img:
+        example: ./abc/123.jpg
+        type: string
+      last_message:
+        example: hello i am J0nh
+        type: string
+      name:
+        example: Mr.J0nh
+        type: string
+      room_type:
+        example: Personal
+        type: string
+      unread:
+        example: 999
+        type: integer
+      update_time:
+        example: ""
+        type: string
+    type: object
+  model.Member:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      friend_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      room_id:
+        type: integer
+      themes:
+        type: string
+      unread:
+        type: integer
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/model.User'
+      user_id:
+        type: integer
+    type: object
+  model.Message:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      id:
+        type: integer
+      room:
+        $ref: '#/definitions/model.Room'
+      room_id:
+        type: integer
+      text:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/model.User'
+      user_id:
+        type: integer
+    type: object
+  model.ResponseCreateSuccess:
+    properties:
+      message:
+        example: Success
+        type: string
+      status:
+        example: 201
+        type: integer
+    type: object
+  model.ResponseError409:
+    properties:
+      message:
+        example: user_name or email is already
+        type: string
+      status:
+        example: 409
+        type: integer
+    type: object
+  model.ResponseError422:
+    properties:
+      message:
+        example: some error message
+        type: string
+      status:
+        example: 422
+        type: integer
+    type: object
+  model.ResponseNoDataSuccess:
+    properties:
+      message:
+        example: success
+        type: string
+      status:
+        example: 200
+        type: integer
+    type: object
+  model.ResponseSuccess:
+    properties:
+      data: {}
+      message:
+        example: success
+        type: string
+      status:
+        example: 200
+        type: integer
+    type: object
+  model.ReturnAllUser:
+    properties:
+      end:
+        example: 20
+        type: integer
+      start:
+        example: 0
+        type: integer
+      total:
+        example: 999
+        type: integer
+      user:
+        items:
+          properties:
+            id:
+              example: 1
+              type: integer
+            username:
+              example: J0nh
+              type: string
+          type: object
+        type: array
+    type: object
+  model.ReturnListChat:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.DataUser'
+        type: array
+      end:
+        example: 20
+        type: integer
+      start:
+        example: 0
+        type: integer
+      total:
+        example: 999
+        type: integer
+    type: object
+  model.Room:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      gen_id:
+        type: string
+      id:
+        type: integer
+      last_message:
+        type: string
+      members:
+        items:
+          $ref: '#/definitions/model.Member'
+        type: array
+      name:
+        type: string
+      room_img:
+        type: string
+      room_type:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  model.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      emain:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      img:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      updatedAt:
+        type: string
+      user_name:
+        type: string
+    type: object
+host: localhost:4000
+info:
+  contact:
+    email: navaketh.pl@inet.co.th
+    name: Navaketh Ploypho
+    url: https://www.pasail.com
+  description: API ListChat demo 50m recoard database
+  title: ListChat50M
+  version: "1.0"
+paths:
+  /v1/all_user:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        เพื่อให้เห็นว่ามีผู้ใช้ทั้งหมดเท่าไรในระบบตอนนี้
+        จำเป็นต้องระบุข้อมูลสำคัญดังนี้ `"limit" สำหรับระบุจำนวนสูงสุด` และ `"offset" สำหรับระบุการ skip ข้อมูล`
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.ResponseSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.ReturnAllUser'
+              type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/model.ResponseError422'
+      summary: สำหรับดึงข้อมูลผู้ใช้ทุกคนออกมา
+      tags:
+      - User
+  /v1/chat/{room-id}:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: chat room id
+        in: path
+        name: room-id
+        required: true
+        type: string
+      - description: ทดสอบ
+        in: body
+        name: Payload
+        required: true
+        schema:
+          $ref: '#/definitions/api.requestCreateRoomPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ResponseNoDataSuccess'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/model.ResponseError422'
+      summary: สำหรับส่งข้อความระหว่าง user ในห้องแชต
+      tags:
+      - Chat
+  /v1/create_room:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        API สำหรับสร้างห้องแชต แบบแชตกลุ่ม และ แชตเดี่ยว
+        กรณีสำหรับระบุแชตเดี่ยวให้กำหนด room_type เป็น `Personal` กรณีแชตกลุ่มให้กำหนด room_type เป็น `Group`
+      parameters:
+      - description: ทดสอบ
+        in: body
+        name: Payload
+        required: true
+        schema:
+          $ref: '#/definitions/api.requestCreateRoomPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ResponseNoDataSuccess'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/model.ResponseError422'
+      summary: สำหรับสร้างห้องแชตระหว่าง user
+      tags:
+      - Room
+  /v1/friend:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        เพื่อให้เห็นว่าผู้ใช้มีเพื่อนทั้งหมดเท่าไรในระบบตอนนี้
+        จำเป็นต้องระบุข้อมูลสำคัญดังนี้ limit สำหรับระบุจำนวนสูงสุด offset สำหรับข้อมูลที่จะปล่อยผ่าน
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Message'
+      summary: สำหรับลิสผู้ใช้ที่เป็นเพื่อนของเป้าหมายที่กำหนด
+      tags:
+      - User
+  /v1/hello:
+    get:
+      description: if you call this api with GET and it return "Hello Fiber!" that
+        api work!
+      responses: {}
+      summary: For test api
+      tags:
+      - Help check
+  /v1/listchat:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        ดึงรายการคู่แชตของผู้ใช้ออกมาโดยเรียงตามลำดับเวลา
+        จำเป็นต้องระบุข้อมูลสำคัญดังนี้ `"user_id" สำหรับระบุเป้าหมายของ listchat ที่ต้องการ` และ `"limit" สำหรับระบุจำนวนสูงสุด` และ `"offset" สำหรับระบุการ skip ข้อมูล`
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.ResponseSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.ReturnListChat'
+              type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/model.ResponseError422'
+      summary: สำหรับดึงคู่แชตของผู้ใช้
+      tags:
+      - Chat
+  /v1/no_friend:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        เพื่อให้เห็นว่ามีผู้ใช้ที่ยังไม่เป็นเพื่อนเท่าไรในระบบตอนนี้
+        จำเป็นต้องระบุข้อมูลสำคัญดังนี้ limit สำหรับระบุจำนวนสูงสุด offset สำหรับข้อมูลที่จะปล่อยผ่าน
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Message'
+      summary: สำหรับลิสผู้ใช้ที่ยังไม่ได้เป็นเพื่อนกับเป้าหมายที่กำหนด
+      tags:
+      - User
+  /v1/register:
+    post:
+      consumes:
+      - application/json
+      description: เป็นขั้นตอนแรกสำหรับสร้างข้อมูลจำลองเข้าสู่ระบบโดยจำเป็นต้องโฟกัสข้อมูลที่ต้องสร้างหลักๆอยู่
+        2 คีย์คือ `user_name` และ `emain` ที่จะต้องห้ามซ้ำกันกับข้อมูลที่เคยมีอยู่ในระบบเด็ดขาด
+      parameters:
+      - description: กรณี แนบ payload มาด้วย
+        in: body
+        name: Payload
+        required: true
+        schema:
+          $ref: '#/definitions/api.requestRegisterPayload'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.ResponseCreateSuccess'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.ResponseError409'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/model.ResponseError422'
+      summary: สำหรับเพิ่มข้อมูลงของสมาชิกเข้าสู่ระบบ
+      tags:
+      - Register
+swagger: "2.0"

@@ -1,10 +1,18 @@
 package model
 
-import "gorm.io/gorm"
+import "time"
+
+type Model struct {
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time `gorm:"index"`
+}
 
 type User struct {
-	gorm.Model
-	ID        uint   `json:"id"           gorm:"not null,index"`
+	// gorm.Model
+	Model
+	ID        uint   `json:"id"           gorm:"index"`
 	UserName  string `json:"user_name"    gorm:"unique"`
 	Img       string `json:"img"`
 	Email     string `json:"emain"        gorm:"unique"`
@@ -14,8 +22,9 @@ type User struct {
 }
 
 type Room struct {
-	gorm.Model
-	ID          uint     `gorm:"index"`
+	// gorm.Model
+	Model
+	ID          uint     `json:"id"            gorm:"index"`
 	RoomType    string   `json:"room_type"`
 	Genid       string   `json:"gen_id"        gorm:"unique"`
 	Name        string   `json:"name"`
@@ -25,9 +34,10 @@ type Room struct {
 }
 
 type Member struct {
-	gorm.Model
-	ID       uint   `json:"id"`
-	RoomID   uint   `json:"room_id"`
+	// gorm.Model
+	Model
+	ID       uint   `json:"id"    gorm:"index"`
+	RoomID   uint   `json:"room_id" gorm:"index"`
 	User     User   `gorm:"foreignKey:UserID"`
 	UserID   uint   `json:"user_id" gorm:"index"`
 	FriendID uint   `json:"friend_id"`
@@ -37,8 +47,9 @@ type Member struct {
 }
 
 type Message struct {
-	gorm.Model
-	ID     uint   `json:"id"`
+	// gorm.Model
+	Model
+	ID     uint   `json:"id" gorm:"index"`
 	Room   Room   `gorm:"foreignKey:RoomID"`
 	RoomID uint   `json:"room_id"`
 	User   User   `gorm:"foreignKey:UserID"`
