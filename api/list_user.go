@@ -93,6 +93,11 @@ func ListUserNotMyFriend(c *fiber.Ctx) error {
 	}
 	fmt.Println(p)
 	returnAllUser := new(model.ReturnAllUser)
+	// tx2 := database.DB.Db.Table("users").Select("count(id) as Total").Not("")
+	// if tx2.Error != nil {
+	// 	fmt.Println(tx2.Error)
+
+	// }
 	tx := database.DB.Db.Raw("SELECT users.id as id from users where id != ? and  id not in (select members.friend_id as id from members inner join rooms on members.room_id = rooms.id WHERE rooms.room_type = 'Personal' AND members.user_id = ?) ORDER BY id asc LIMIT ? OFFSET ?", p.Userid, p.Userid, p.Limit, p.Offset).Scan(&returnAllUser.User)
 	if tx.Error != nil {
 		fmt.Println(tx.Error)
