@@ -33,6 +33,22 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "สำหรับดึงข้อมูลผู้ใช้ทุกคนออกมา",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -61,7 +77,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/chat/{room-id}": {
+        "/v1/chat/{room-genid}": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -76,18 +92,18 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "chat room id",
-                        "name": "room-id",
+                        "description": "use genid",
+                        "name": "room-genid",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "ทดสอบ",
+                        "description": "Body Json",
                         "name": "Payload",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.requestCreateRoomPayload"
+                            "$ref": "#/definitions/api.RequestChatUser"
                         }
                     }
                 ],
@@ -157,11 +173,45 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "สำหรับลิสผู้ใช้ที่เป็นเพื่อนของเป้าหมายที่กำหนด",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Message"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.ResponseSuccess"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.ReturnAllUser"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseError422"
                         }
                     }
                 }
@@ -190,6 +240,29 @@ const docTemplate = `{
                     "Chat"
                 ],
                 "summary": "สำหรับดึงคู่แชตของผู้ใช้",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user_id",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -228,11 +301,45 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "สำหรับลิสผู้ใช้ที่ยังไม่ได้เป็นเพื่อนกับเป้าหมายที่กำหนด",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Message"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.ResponseSuccess"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.ReturnAllUser"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseError422"
                         }
                     }
                 }
@@ -283,6 +390,19 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "api.RequestChatUser": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string",
+                    "example": "hello Mr.J0nh"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "api.requestCreateRoomPayload": {
             "type": "object",
             "properties": {
@@ -309,7 +429,7 @@ const docTemplate = `{
         "api.requestRegisterPayload": {
             "type": "object",
             "properties": {
-                "emain": {
+                "email": {
                     "type": "string",
                     "example": "example@mail.com"
                 },
@@ -369,76 +489,6 @@ const docTemplate = `{
                 "update_time": {
                     "type": "string",
                     "example": ""
-                }
-            }
-        },
-        "model.Member": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
-                "friend_id": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "room_id": {
-                    "type": "integer"
-                },
-                "themes": {
-                    "type": "string"
-                },
-                "unread": {
-                    "type": "integer"
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/model.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "model.Message": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "room": {
-                    "$ref": "#/definitions/model.Room"
-                },
-                "room_id": {
-                    "type": "integer"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/model.User"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },
@@ -561,79 +611,6 @@ const docTemplate = `{
                 "total": {
                     "type": "integer",
                     "example": 999
-                }
-            }
-        },
-        "model.Room": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
-                "gen_id": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "last_message": {
-                    "type": "string"
-                },
-                "members": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Member"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                },
-                "room_img": {
-                    "type": "string"
-                },
-                "room_type": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.User": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
-                "emain": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "img": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "user_name": {
-                    "type": "string"
                 }
             }
         }

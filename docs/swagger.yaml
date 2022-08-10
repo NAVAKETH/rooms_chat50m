@@ -1,5 +1,14 @@
 basePath: /api
 definitions:
+  api.RequestChatUser:
+    properties:
+      text:
+        example: hello Mr.J0nh
+        type: string
+      user_id:
+        example: 1
+        type: integer
+    type: object
   api.requestCreateRoomPayload:
     properties:
       members:
@@ -17,7 +26,7 @@ definitions:
     type: object
   api.requestRegisterPayload:
     properties:
-      emain:
+      email:
         example: example@mail.com
         type: string
       first_name:
@@ -62,52 +71,6 @@ definitions:
       update_time:
         example: ""
         type: string
-    type: object
-  model.Member:
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      friend_id:
-        type: integer
-      id:
-        type: integer
-      name:
-        type: string
-      room_id:
-        type: integer
-      themes:
-        type: string
-      unread:
-        type: integer
-      updatedAt:
-        type: string
-      user:
-        $ref: '#/definitions/model.User'
-      user_id:
-        type: integer
-    type: object
-  model.Message:
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      id:
-        type: integer
-      room:
-        $ref: '#/definitions/model.Room'
-      room_id:
-        type: integer
-      text:
-        type: string
-      updatedAt:
-        type: string
-      user:
-        $ref: '#/definitions/model.User'
-      user_id:
-        type: integer
     type: object
   model.ResponseCreateSuccess:
     properties:
@@ -194,54 +157,6 @@ definitions:
         example: 999
         type: integer
     type: object
-  model.Room:
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      gen_id:
-        type: string
-      id:
-        type: integer
-      last_message:
-        type: string
-      members:
-        items:
-          $ref: '#/definitions/model.Member'
-        type: array
-      name:
-        type: string
-      room_img:
-        type: string
-      room_type:
-        type: string
-      updatedAt:
-        type: string
-    type: object
-  model.User:
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      emain:
-        type: string
-      first_name:
-        type: string
-      id:
-        type: integer
-      img:
-        type: string
-      last_name:
-        type: string
-      password:
-        type: string
-      updatedAt:
-        type: string
-      user_name:
-        type: string
-    type: object
 host: localhost:4000
 info:
   contact:
@@ -259,6 +174,17 @@ paths:
       description: |-
         เพื่อให้เห็นว่ามีผู้ใช้ทั้งหมดเท่าไรในระบบตอนนี้
         จำเป็นต้องระบุข้อมูลสำคัญดังนี้ `"limit" สำหรับระบุจำนวนสูงสุด` และ `"offset" สำหรับระบุการ skip ข้อมูล`
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: string
+      - description: offset
+        in: query
+        name: offset
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -278,22 +204,22 @@ paths:
       summary: สำหรับดึงข้อมูลผู้ใช้ทุกคนออกมา
       tags:
       - User
-  /v1/chat/{room-id}:
+  /v1/chat/{room-genid}:
     post:
       consumes:
       - application/json
       parameters:
-      - description: chat room id
+      - description: use genid
         in: path
-        name: room-id
+        name: room-genid
         required: true
         type: string
-      - description: ทดสอบ
+      - description: Body Json
         in: body
         name: Payload
         required: true
         schema:
-          $ref: '#/definitions/api.requestCreateRoomPayload'
+          $ref: '#/definitions/api.RequestChatUser'
       produces:
       - application/json
       responses:
@@ -343,11 +269,31 @@ paths:
       description: |-
         เพื่อให้เห็นว่าผู้ใช้มีเพื่อนทั้งหมดเท่าไรในระบบตอนนี้
         จำเป็นต้องระบุข้อมูลสำคัญดังนี้ limit สำหรับระบุจำนวนสูงสุด offset สำหรับข้อมูลที่จะปล่อยผ่าน
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: string
+      - description: offset
+        in: query
+        name: offset
+        required: true
+        type: string
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Message'
+            allOf:
+            - $ref: '#/definitions/model.ResponseSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.ReturnAllUser'
+              type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/model.ResponseError422'
       summary: สำหรับลิสผู้ใช้ที่เป็นเพื่อนของเป้าหมายที่กำหนด
       tags:
       - User
@@ -366,6 +312,22 @@ paths:
       description: |-
         ดึงรายการคู่แชตของผู้ใช้ออกมาโดยเรียงตามลำดับเวลา
         จำเป็นต้องระบุข้อมูลสำคัญดังนี้ `"user_id" สำหรับระบุเป้าหมายของ listchat ที่ต้องการ` และ `"limit" สำหรับระบุจำนวนสูงสุด` และ `"offset" สำหรับระบุการ skip ข้อมูล`
+      parameters:
+      - description: user_id
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: string
+      - description: offset
+        in: query
+        name: offset
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -392,11 +354,31 @@ paths:
       description: |-
         เพื่อให้เห็นว่ามีผู้ใช้ที่ยังไม่เป็นเพื่อนเท่าไรในระบบตอนนี้
         จำเป็นต้องระบุข้อมูลสำคัญดังนี้ limit สำหรับระบุจำนวนสูงสุด offset สำหรับข้อมูลที่จะปล่อยผ่าน
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: string
+      - description: offset
+        in: query
+        name: offset
+        required: true
+        type: string
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Message'
+            allOf:
+            - $ref: '#/definitions/model.ResponseSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.ReturnAllUser'
+              type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/model.ResponseError422'
       summary: สำหรับลิสผู้ใช้ที่ยังไม่ได้เป็นเพื่อนกับเป้าหมายที่กำหนด
       tags:
       - User

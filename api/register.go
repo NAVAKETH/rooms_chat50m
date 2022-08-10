@@ -12,7 +12,7 @@ import (
 type requestRegisterPayload struct {
 	UserName  string `json:"user_name"  example:"J0nh"`
 	Img       string `json:"img"        example:"./abc/123demo_path.png"`
-	Email     string `json:"emain"      example:"example@mail.com"`
+	Email     string `json:"email"      example:"example@mail.com"`
 	Password  string `json:"password"   example:"demoPassW0rd@123!"`
 	FirstName string `json:"first_name" example:"Jonh"`
 	LastName  string `json:"last_name"  example:"Smith"`

@@ -15,7 +15,7 @@ type User struct {
 	ID        uint   `json:"id"           gorm:"index"`
 	UserName  string `json:"user_name"    gorm:"unique"`
 	Img       string `json:"img"`
-	Email     string `json:"emain"        gorm:"unique"`
+	Email     string `json:"email"        gorm:"unique"`
 	Password  string `json:"password"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`

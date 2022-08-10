@@ -1,3 +1,6 @@
+dev-run:
+	swag init
+	go run main.go
 reload:
 	docker-compose down
 	docker-compose up -d

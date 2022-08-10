@@ -26,6 +26,8 @@ type InputParamsListFriend struct {
 // @Tags User
 // @Accept json
 // @Produce json
+// @Param limit   query string true "limit"
+// @Param offset  query string true "offset"
 // @Success 200 {object} model.ResponseSuccess{data=model.ReturnAllUser}
 // @Failure 422 {object} model.ResponseError422
 // @Router /v1/all_user [get]
@@ -54,6 +56,8 @@ func ListAllUser(c *fiber.Ctx) error {
 // @Description  จำเป็นต้องระบุข้อมูลสำคัญดังนี้ limit สำหรับระบุจำนวนสูงสุด offset สำหรับข้อมูลที่จะปล่อยผ่าน
 // @Tags User
 // @Accept json
+// @Param limit   query string true "limit"
+// @Param offset  query string true "offset"
 // @Success 200 {object} model.ResponseSuccess{data=model.ReturnAllUser}
 // @Failure 422 {object} model.ResponseError422
 // @Router /v1/friend [get]
@@ -83,6 +87,8 @@ func ListUserMyFriend(c *fiber.Ctx) error {
 // @Description  จำเป็นต้องระบุข้อมูลสำคัญดังนี้ limit สำหรับระบุจำนวนสูงสุด offset สำหรับข้อมูลที่จะปล่อยผ่าน
 // @Tags User
 // @Accept json
+// @Param limit   query string true "limit"
+// @Param offset  query string true "offset"
 // @Success 200 {object} model.ResponseSuccess{data=model.ReturnAllUser}
 // @Failure 422 {object} model.ResponseError422
 // @Router /v1/no_friend [get]

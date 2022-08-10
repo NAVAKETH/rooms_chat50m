@@ -17,12 +17,20 @@ type InputParamsListChat struct {
 	Offset int `query:"offset"`
 }
 
+type RequestChatUser struct {
+	User uint   `json:"user_id" example:"1"`
+	Text string `json:"text"    example:"hello Mr.J0nh"`
+}
+
 // @Summary สำหรับดึงคู่แชตของผู้ใช้
 // @Description ดึงรายการคู่แชตของผู้ใช้ออกมาโดยเรียงตามลำดับเวลา
 // @Description จำเป็นต้องระบุข้อมูลสำคัญดังนี้ `"user_id" สำหรับระบุเป้าหมายของ listchat ที่ต้องการ` และ `"limit" สำหรับระบุจำนวนสูงสุด` และ `"offset" สำหรับระบุการ skip ข้อมูล`
 // @Tags Chat
 // @Accept json
 // @Produce json
+// @Param user_id query string true "user_id"
+// @Param limit   query string true "limit"
+// @Param offset  query string true "offset"
 // @Success 200 {object} model.ResponseSuccess{data=model.ReturnListChat}
 // @Failure 422 {object} model.ResponseError422
 // @Router /v1/listchat [get]
@@ -56,25 +64,21 @@ func ChatList(c *fiber.Ctx) error {
 // @Tags Chat
 // @Accept json
 // @Produce json
-// @Param room-id path string true  "chat room id"
-// @Param Payload body requestCreateRoomPayload true "ทดสอบ"
+// @Param room-genid path string true  "use genid"
+// @Param Payload body RequestChatUser true "Body Json"
 // @Success 200 {object} model.ResponseNoDataSuccess
 // @Failure 422 {object} model.ResponseError422
-// @Router /v1/chat/{room-id} [post]
+// @Router /v1/chat/{room-genid} [post]
 func Chat(c *fiber.Ctx) error {
 	// -----------------------
 	time_total := time.Now()
 	time_start := time.Now()
 	// -----------------------
-	type chatResult struct {
-		User uint   `json:"user"`
-		Text string `json:"text"`
-	}
 	type ReturnRoomsID struct {
 		Id uint `json:"id"`
 	}
 	// -----------------------
-	message := chatResult{}
+	message := RequestChatUser{}
 	if err := c.BodyParser(&message); err != nil {
 		return utility.ResponseError(c, fiber.StatusUnprocessableEntity, err.Error())
 	}
